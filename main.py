@@ -1,6 +1,12 @@
 from fastapi import FastAPI, status, HTTPException, responses
 from fastapi.middleware.cors import CORSMiddleware
 from loopers import loop
+from pydantic import BaseModel
+
+
+class Link(BaseModel):
+    link: str
+
 
 app = FastAPI()
 
@@ -21,9 +27,9 @@ app.add_middleware(
 
 
 @app.post('/', status_code=status.HTTP_200_OK)
-async def view(link: str):
+async def view(link: Link):
     try:
-        links = loop(link)
+        links = loop(link.link)
         return responses.JSONResponse(links, status_code=status.HTTP_200_OK)
     except Exception:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'Invalid url {link}')
